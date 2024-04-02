@@ -1,0 +1,32 @@
+---
+title: "Data_Exploration"
+format: html
+editor: visual
+---
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>.
+
+```{r}
+data = da28762.0001
+head(data)
+
+library(stats)
+library(car)
+library(caret)
+
+View(data)
+```
+
+```{r}
+hrmday0_column <- na.omit(data$HRMDAY0)
+max_value <- max(hrmday0_column)
+print(max_value)
+
+hist(hrmday0_column, main = "Histogram of HRMDAY0", xlab = "HRMDAY0 values", ylab = "Frequency")
+```
+
+```{r}
+linear.model <- lm()
+```

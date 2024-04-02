@@ -1,0 +1,39 @@
+---
+title: "SWAN Exploration"
+author: "Vix Talbot"
+date: "2024-01-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+data = da28762.0001
+head(data)
+
+# Assuming your dataset is named 'data'
+# Extracting the 'HRMDAY0' column and removing NAs
+hrmday0_column <- na.omit(data$HRMDAY0)
+
+# Finding the maximum value in the 'HRMDAY0' column (after removing NAs)
+max_value <- max(hrmday0_column)
+
+# Print or use the max value as needed
+print(max_value)
+
+# Assuming your dataset is named 'data'
+# Extracting the 'HRMDAY0' column and removing NAs
+hrmday0_column <- na.omit(data$HRMDAY0)
+
+# Creating a histogram
+hist(hrmday0_column, main = "Histogram of HRMDAY0", xlab = "HRMDAY0 values", ylab = "Frequency")
+
+```
+
+```{r}
+
+
+
+```
