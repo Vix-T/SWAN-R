@@ -12,6 +12,8 @@ Quarto enables you to weave together content and executable code into a finished
 data = da28762.0001
 head(data)
 
+library(tidyverse)
+library(dplyr)
 library(stats)
 library(car)
 library(caret)
@@ -20,11 +22,25 @@ View(data)
 ```
 
 ```{r}
-hrmday0_column <- na.omit(data$HRMDAY0)
-max_value <- max(hrmday0_column)
-print(max_value)
+data %>%
+  select()
+```
 
-hist(hrmday0_column, main = "Histogram of HRMDAY0", xlab = "HRMDAY0 values", ylab = "Frequency")
+```{r}
+# glimpse(data)
+
+ID <- na.omit(data$SWANID)
+status0 <- na.omit(data$STATUS0)
+spbmd <- na.omit(data$SPBMDDT0)
+hpbmd <- na.omit(data$HPBMDDT0)
+ojcalc <- na.omit(data$OJCALC0)
+yrsca <- na.omit(data$YRSCA0)
+supca <- na.omit(data$SUPCA0)
+dttcalc <- na.omit(data$DTTCALC0)
+allcalc <- na.omit(data$ALLCALC0)
+
+
+data <- data.frame( ,)
 ```
 
 ```{r}
