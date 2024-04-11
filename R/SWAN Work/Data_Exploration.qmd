@@ -22,27 +22,116 @@ View(data)
 ```
 
 ```{r}
-data %>%
-  select()
+# I only want the columns relevant to my study
+reduced_data <- data %>%
+                  select(SWANID, STATUS0, SPBMDT0, HPBMDT0, OJCALC0, SUPCA0, DTTCALC0, ALLCALC0, AGE0, RACE, INCOME0)
 ```
 
 ```{r}
 # glimpse(data)
+# I don't want NAs to interfere with my analysis
 
-ID <- na.omit(data$SWANID)
-status0 <- na.omit(data$STATUS0)
-spbmd <- na.omit(data$SPBMDDT0)
-hpbmd <- na.omit(data$HPBMDDT0)
-ojcalc <- na.omit(data$OJCALC0)
-yrsca <- na.omit(data$YRSCA0)
-supca <- na.omit(data$SUPCA0)
-dttcalc <- na.omit(data$DTTCALC0)
-allcalc <- na.omit(data$ALLCALC0)
+clean_data <- reduced_data %>% drop_na()
+# glimpse(clean_data)
+# head(clean_data)
+# View(clean_data)
 
-
-data <- data.frame( ,)
+# ensuring that I didn't lose too much information with that large drop
+dim(reduced_data)
+dim(clean_data)
 ```
 
 ```{r}
-linear.model <- lm()
+# mutates this changes your categorical variables into meaningful names
+# say we're mutating a coded categorical "race"
+
+clean_data <- clean_data %>% mutate(ETHNICITY = case_when(
+RACE == "(1) Black/African American" ~ "Black/African American",
+RACE == "(2) Chinese/Chinese American" ~ "Chinese/Chinese American",
+RACE == "(3) Japanese/Japanese American" ~ "Japanese/Japanese American",
+RACE == "(4) Caucasian/White Non-Hispanic" ~ "Caucasian/White Non-Hispanic",
+RACE == "(5) Hispanic" ~ "Hispanic"
+))
+
+head(clean_data)
+unique(clean_data$STATUS0)
+```
+
+```{r}
+# an overall look for trends in the data omiting the participant ID column
+
+pairs(clean_data[,2:10])
+
+```
+
+```{r}
+# data exploration
+# SWANID, STATUS0, SPBMDT0, HPBMDT0, OJCALC0, SUPCA0, DTTCALC0, ALLCALC0, AGE0, RACE, INCOME0
+
+calc_p <- ggplot(data = clean_data, aes(x = ALLCALC0,
+                          y = SPBMDT0)) +
+  geom_point(color = "red") +
+  labs(x = "Calcium Intake", y = "Spinal BMD", title = "Scatterplot of Calcium vs Spinal BMD")
+
+calc_p2 <- ggplot(data = clean_data, aes(x = ALLCALC0,
+                          y = HPBMDT0)) +
+  geom_point(color = "orange") +
+  labs(x = "Calcium Intake", y = "Hip BMD", title = "Scatterplot of Calcium vs Hip BMD")
+
+calc_p + geom_smooth(method = "loess")
+
+calc_p2 + geom_smooth(method = "loess")
+```
+
+```{r}
+# data exploration
+# SWANID, STATUS0, SPBMDT0, HPBMDT0, OJCALC0, SUPCA0, DTTCALC0, ALLCALC0, AGE0, RACE, INCOME0
+
+ggplot(data = clean_data, aes(group = AGE0, x = AGE0, y = SPBMDT0)) +
+  geom_boxplot(color = "purple", outlier.colour="black", outlier.shape=16,
+             outlier.size=2, notch=FALSE) + labs( x = "Age", y = "Spinal BMD", title = "Boxplot of Age vs Spinal BMD")
+  
+```
+
+```{r}
+# data exploration
+# SWANID, STATUS0, SPBMDT0, HPBMDT0, OJCALC0, SUPCA0, DTTCALC0, ALLCALC0, AGE0, RACE, INCOME0, ETHNICITY
+# note that we no longer have any hispanic participants in this clean data set
+
+p <- ggplot(data = clean_data, aes(group = ETHNICITY, x = ETHNICITY, y = SPBMDT0)) +
+  geom_boxplot(color = "coral", notch = TRUE, outlier.colour="black", outlier.shape=1,
+                outlier.size=2) +
+  labs(x = "Ethnicity", y = "Spinal BMD", title = "Boxplot of Ethnicity vs Spinal BMD")
+
+p + coord_flip()
+```
+
+# Regression Modeling
+
+```{r}
+# we have two response variables, spinal BMD and hip BMD
+# building simple linear regression models for both using calcium related predictors
+
+# SWANID, STATUS0, SPBMDT0, HPBMDT0, OJCALC0, SUPCA0, DTTCALC0, ALLCALC0, AGE0, RACE, INCOME0, ETHNICITY
+
+spine_lm_base <- lm(SPBMDT0 ~ STATUS0 + OJCALC0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0, data = clean_data)
+summary(spine_lm_base)
+
+hip_lm_base <- lm(HPBMDT0 ~ STATUS0 + OJCALC0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0, data = clean_data)
+summary(hip_lm_base)
+```
+
+```{r}
+# we have two response variables, spinal BMD and hip BMD
+
+
+# building simple linear regression models for both but now adding in demographic predictors
+
+# SWANID, STATUS0, SPBMDT0, HPBMDT0, OJCALC0, SUPCA0, DTTCALC0, ALLCALC0, AGE0, RACE, INCOME0, ETHNICITY
+
+spine_lm_demo <- lm(SPBMDT0 ~ STATUS0 + OJCALC0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0 + AGE0 + ETHNICITY + INCOME0, data = clean_data)
+summary(spine_lm_demo)
+
+hip_lm_demo <- lm(HPBMDT0 ~ STATUS0 + OJCALC0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0 + AGE0 + ETHNICITY + INCOME0, data = clean_data)
+summary(hip_lm_demo)
 ```
