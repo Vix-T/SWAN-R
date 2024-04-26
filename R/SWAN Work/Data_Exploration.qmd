@@ -17,6 +17,7 @@ library(dplyr)
 library(stats)
 library(car)
 library(caret)
+library(modeldata)
 
 View(data)
 ```
@@ -24,7 +25,7 @@ View(data)
 ```{r}
 # I only want the columns relevant to my study
 reduced_data <- data %>%
-                  select(SWANID, STATUS0, SPBMDT0, HPBMDT0, OJCALC0, SUPCA0, DTTCALC0, ALLCALC0, AGE0, RACE, INCOME0)
+                  select(SWANID, STATUS0, SPBMDT0, HPBMDT0, SUPCA0, DTTCALC0, ALLCALC0, AGE0, RACE, INCOME0, ALCHSRV0)
 ```
 
 ```{r}
@@ -60,7 +61,7 @@ unique(clean_data$STATUS0)
 ```{r}
 # an overall look for trends in the data omiting the participant ID column
 
-pairs(clean_data[,2:10])
+pairs(clean_data[,2:11])
 
 ```
 
@@ -112,26 +113,21 @@ p + coord_flip()
 # we have two response variables, spinal BMD and hip BMD
 # building simple linear regression models for both using calcium related predictors
 
-# SWANID, STATUS0, SPBMDT0, HPBMDT0, OJCALC0, SUPCA0, DTTCALC0, ALLCALC0, AGE0, RACE, INCOME0, ETHNICITY
-
-spine_lm_base <- lm(SPBMDT0 ~ STATUS0 + OJCALC0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0, data = clean_data)
+spine_lm_base <- lm(SPBMDT0 ~ STATUS0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0, data = clean_data)
 summary(spine_lm_base)
 
-hip_lm_base <- lm(HPBMDT0 ~ STATUS0 + OJCALC0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0, data = clean_data)
+hip_lm_base <- lm(HPBMDT0 ~ STATUS0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0, data = clean_data)
 summary(hip_lm_base)
 ```
 
 ```{r}
 # we have two response variables, spinal BMD and hip BMD
-
-
 # building simple linear regression models for both but now adding in demographic predictors
 
-# SWANID, STATUS0, SPBMDT0, HPBMDT0, OJCALC0, SUPCA0, DTTCALC0, ALLCALC0, AGE0, RACE, INCOME0, ETHNICITY
 
-spine_lm_demo <- lm(SPBMDT0 ~ STATUS0 + OJCALC0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0 + AGE0 + ETHNICITY + INCOME0, data = clean_data)
+spine_lm_demo <- lm(SPBMDT0 ~ STATUS0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0 + AGE0 + ETHNICITY + INCOME0, ALCHSRV0, data = clean_data)
 summary(spine_lm_demo)
 
-hip_lm_demo <- lm(HPBMDT0 ~ STATUS0 + OJCALC0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0 + AGE0 + ETHNICITY + INCOME0, data = clean_data)
+hip_lm_demo <- lm(HPBMDT0 ~ STATUS0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0 + AGE0 + ETHNICITY + INCOME0, ALCHSRV0, data = clean_data)
 summary(hip_lm_demo)
 ```
