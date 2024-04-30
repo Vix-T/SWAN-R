@@ -25,7 +25,7 @@ View(data)
 ```{r}
 # I only want the columns relevant to my study
 reduced_data <- data %>%
-                  select(SWANID, STATUS0, SPBMDT0, HPBMDT0, SUPCA0, DTTCALC0, ALLCALC0, AGE0, RACE, INCOME0, ALCHSRV0)
+                  select(SWANID, STATUS0, SPBMDT0, HPBMDT0, SUPCA0, DTTCALC0, ALLCALC0, AGE0, RACE, INCOME0, ALCHSRV0, SMOKERE0)
 ```
 
 ```{r}
@@ -61,7 +61,7 @@ unique(clean_data$STATUS0)
 ```{r}
 # an overall look for trends in the data omiting the participant ID column
 
-pairs(clean_data[,2:11])
+pairs(clean_data[,2:12])
 
 ```
 
@@ -110,13 +110,53 @@ p + coord_flip()
 # Regression Modeling
 
 ```{r}
+
+```
+
+```{r}
+# create RACE dummy variables
+clean_data$Black <- ifelse(clean_data$RACE=="(1) Black/African American", 1,0)
+clean_data$Chinese <- ifelse(clean_data$RACE=="(2) Chinese/Chinese American", 1,0)
+clean_data$Japanese <- ifelse(clean_data$RACE=="(3) Japanese/Japanese American", 1,0)
+clean_data$Caucasian <- ifelse(clean_data$RACE=="(4) Caucasian/White Non-Hispanic", 1,0)
+clean_data$Hispanic <- ifelse(clean_data$RACE=="(5) Hispanic", 1,0)
+
+# Create dummy variables for the "INCOME0" predictor
+clean_data$Income_1 <- ifelse(clean_data$INCOME0 == "(1) Less Than $19,999", 1, 0)
+clean_data$Income_2 <- ifelse(clean_data$INCOME0 == "(2) $20,000 to $49,999", 1, 0)
+clean_data$Income_3 <- ifelse(clean_data$INCOME0 == "(3) $50,000 to $99,999", 1, 0)
+clean_data$Income_4 <- ifelse(clean_data$INCOME0 == "(4) $100,000 or More", 1, 0)
+
+# Create dummy variables for the "ALCHSRV0" predictor
+clean_data$Alcohol_1 <- ifelse(clean_data$ALCHSRV0 == "(1) Never Drank", 1, 0)
+clean_data$Alcohol_2 <- ifelse(clean_data$ALCHSRV0 == "(2) Past Drinker", 1, 0)
+clean_data$Alcohol_3 <- ifelse(clean_data$ALCHSRV0 == "(3) Currently Drink", 1, 0)
+
+# Create dummy variables for the "SMOKERE0" predictor
+clean_data$Smokers_1 <- ifelse(clean_data$SMOKERE0 == "(1) Never Smoked", 1, 0)
+clean_data$Smokers_2 <- ifelse(clean_data$SMOKERE0 == "(2) Past Smoker", 1, 0)
+clean_data$Smokers_3 <- ifelse(clean_data$SMOKERE0 == "(3) Currently Smoke", 1, 0)
+
+# Create dummy variables for the "STATUS0" predictor
+clean_data$Status_1 <- ifelse(clean_data$STATUS0 == "(1) Post by BSO", 1, 0)
+clean_data$Status_2 <- ifelse(clean_data$STATUS0 == "(2) Natural Post", 1, 0)
+clean_data$Status_3 <- ifelse(clean_data$STATUS0 == "(3) Late Peri", 1, 0)
+clean_data$Status_4 <- ifelse(clean_data$STATUS0 == "(4) Early Peri", 1, 0)
+clean_data$Status_5 <- ifelse(clean_data$STATUS0 == "(5) Pre-menopausal", 1, 0)
+clean_data$Status_6 <- ifelse(clean_data$STATUS0 == "(6) Pregnant/breastfeeding", 1, 0)
+clean_data$Status_7 <- ifelse(clean_data$STATUS0 == "(7) Unknown due to HT use", 1, 0)
+clean_data$Status_8 <- ifelse(clean_data$STATUS0 == "(8) Unknown due to hysterectomy", 1, 0)
+
+```
+
+```{r}
 # we have two response variables, spinal BMD and hip BMD
 # building simple linear regression models for both using calcium related predictors
 
-spine_lm_base <- lm(SPBMDT0 ~ STATUS0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0, data = clean_data)
+spine_lm_base <- lm(SPBMDT0 ~ STATUS0 + SUPCA0 + DTTCALC0, data = clean_data)
 summary(spine_lm_base)
 
-hip_lm_base <- lm(HPBMDT0 ~ STATUS0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0, data = clean_data)
+hip_lm_base <- lm(HPBMDT0 ~ STATUS0 + SUPCA0 + DTTCALC0, data = clean_data)
 summary(hip_lm_base)
 ```
 
@@ -125,9 +165,10 @@ summary(hip_lm_base)
 # building simple linear regression models for both but now adding in demographic predictors
 
 
-spine_lm_demo <- lm(SPBMDT0 ~ STATUS0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0 + AGE0 + ETHNICITY + INCOME0, ALCHSRV0, data = clean_data)
+spine_lm_demo <- lm(SPBMDT0 ~ STATUS0 + SUPCA0 
+                    + DTTCALC0 + AGE0 + ETHNICITY + INCOME0, data = clean_data)
 summary(spine_lm_demo)
 
-hip_lm_demo <- lm(HPBMDT0 ~ STATUS0 + SUPCA0 + SUPCA0 + DTTCALC0 + ALLCALC0 + AGE0 + ETHNICITY + INCOME0, ALCHSRV0, data = clean_data)
+hip_lm_demo <- lm(HPBMDT0 ~ STATUS0 + SUPCA0 + DTTCALC0 + AGE0 + ETHNICITY + INCOME0, data = clean_data)
 summary(hip_lm_demo)
 ```
